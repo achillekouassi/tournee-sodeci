@@ -2,7 +2,6 @@
 
 export interface AgentDTO {
   matricule: string;
-  codeAgence: string;
   nom: string;
   prenoms: string;
   fonction?: string;

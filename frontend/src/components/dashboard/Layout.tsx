@@ -7,11 +7,13 @@ interface LayoutProps {
   children: React.ReactNode;
   activeModule: string;
   onModuleChange: (moduleId: string) => void;
+  userName?: string;
+  userRole?: string;
 }
 
-export const Layout: React.FC<LayoutProps> = ({ children, activeModule, onModuleChange }) => {
+export const Layout: React.FC<LayoutProps> = ({ children, activeModule, onModuleChange, userName, userRole }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -19,8 +21,8 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeModule, onModule
         isOpen={sidebarOpen}
         activeModule={activeModule}
         onModuleChange={onModuleChange}
-        userName={`${user?.prenoms} ${user?.nom}`}
-        userRole={user?.fonction}
+        userName={userName}
+        userRole={userRole}
       />
 
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -28,14 +30,12 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeModule, onModule
           sidebarOpen={sidebarOpen}
           onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
           onLogout={logout}
-          userName={`${user?.prenoms} ${user?.nom}`}
-          userRole={user?.fonction}
+          userName={userName}
+          userRole={userRole}
         />
 
         <main className="flex-1 overflow-y-auto p-6">
-          <div className="max-w-7xl mx-auto">
-            {children}
-          </div>
+          <div className="max-w-7xl mx-auto">{children}</div>
         </main>
       </div>
     </div>

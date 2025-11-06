@@ -1,98 +1,107 @@
+// src/components/tournees/TourneeCard.tsx
+
 import React from 'react';
-import { MapPin, User, Calendar, Clock } from 'lucide-react';
+import { MapPin, Edit, Trash2, Eye } from 'lucide-react';
+import { TourneeDTO, StatutTournee } from '../../types/tournee';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
+import { Badge } from '../ui/Badge';
+
+type BadgeVariant = 'green' | 'blue' | 'gray' | 'orange' | 'red' | 'yellow' | 'purple';
 
 interface TourneeCardProps {
-  tournee: {
-    id: string;
-    code: string;
-    libelle: string;
-    agent?: string;
-    dateAffectation?: string;
-    statut: 'AFFECTEE' | 'EN_COURS' | 'TERMINEE' | 'SUSPENDUE';
-    progression: number;
-    compteursTotal: number;
-    compteursReleves: number;
-    anomalies: number;
-  };
-  onViewDetails: (id: string) => void;
+  tournee: TourneeDTO;
+  onViewDetails: (id: number) => void;
+  onEdit: (id: number) => void;
+  onDelete: (id: number) => void;
 }
 
-export const TourneeCard: React.FC<TourneeCardProps> = ({ tournee, onViewDetails }) => {
-  const statutColors = {
-    AFFECTEE: 'bg-blue-100 text-blue-700',
-    EN_COURS: 'bg-emerald-100 text-emerald-700',
-    TERMINEE: 'bg-gray-100 text-gray-700',
-    SUSPENDUE: 'bg-orange-100 text-orange-700'
-  };
+export const TourneeCard: React.FC<TourneeCardProps> = ({ 
+  tournee, 
+  onViewDetails, 
+  onEdit, 
+  onDelete 
+}) => {
+  const getStatutBadge = (statut?: StatutTournee) => {
+    const config: Record<string, { variant: BadgeVariant; label: string }> = {
+      ACTIVE: { variant: 'green', label: 'Active' },
+      EN_COURS: { variant: 'blue', label: 'En cours' },
+      TERMINEE: { variant: 'gray', label: 'Terminée' },
+      SUSPENDUE: { variant: 'orange', label: 'Suspendue' },
+      INACTIVE: { variant: 'red', label: 'Inactive' }
+    };
 
-  const statutLabels = {
-    AFFECTEE: 'Affectée',
-    EN_COURS: 'En cours',
-    TERMINEE: 'Terminée',
-    SUSPENDUE: 'Suspendue'
+    const conf = config[statut || 'ACTIVE'];
+    return <Badge variant={conf.variant}>{conf.label}</Badge>;
   };
 
   return (
-    <Card padding="sm">
+    <Card>
       <div className="flex items-start justify-between mb-3">
-        <div>
+        <div className="flex-1">
           <div className="flex items-center space-x-2 mb-1">
-            <h3 className="text-sm font-semibold text-gray-800">{tournee.code}</h3>
-            <span className={`px-2 py-0.5 rounded text-xs font-medium ${statutColors[tournee.statut]}`}>
-              {statutLabels[tournee.statut]}
-            </span>
+            <h3 className="text-sm font-semibold text-gray-800">{tournee.codeTournee}</h3>
+            {getStatutBadge(tournee.statut)}
           </div>
           <p className="text-xs text-gray-600">{tournee.libelle}</p>
         </div>
         <MapPin size={16} className="text-emerald-600" />
       </div>
 
-      {tournee.agent && (
-        <div className="flex items-center space-x-2 mb-2">
-          <User size={14} className="text-gray-400" />
-          <span className="text-xs text-gray-600">{tournee.agent}</span>
-        </div>
-      )}
-
-      {tournee.dateAffectation && (
-        <div className="flex items-center space-x-2 mb-3">
-          <Calendar size={14} className="text-gray-400" />
-          <span className="text-xs text-gray-600">{tournee.dateAffectation}</span>
-        </div>
-      )}
-
-      <div className="mb-2">
-        <div className="flex items-center justify-between text-xs mb-1">
-          <span className="text-gray-600">Progression</span>
-          <span className="font-medium text-gray-800">
-            {tournee.compteursReleves}/{tournee.compteursTotal}
-          </span>
-        </div>
-        <div className="w-full bg-gray-200 rounded-full h-1.5">
-          <div
-            className="bg-emerald-500 h-1.5 rounded-full transition-all"
-            style={{ width: `${tournee.progression}%` }}
-          ></div>
-        </div>
+      <div className="space-y-2 mb-3">
+        {tournee.quartier && (
+          <div className="flex items-center space-x-2">
+            <MapPin size={14} className="text-gray-400" />
+            <span className="text-xs text-gray-600">{tournee.quartier}</span>
+          </div>
+        )}
+        {tournee.nombreCompteursEstime && (
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-gray-600">Compteurs estimés</span>
+            <span className="font-medium text-gray-800">{tournee.nombreCompteursEstime}</span>
+          </div>
+        )}
+        {tournee.tauxCompletion !== undefined && (
+          <div>
+            <div className="flex items-center justify-between text-xs mb-1">
+              <span className="text-gray-600">Progression</span>
+              <span className="font-medium text-gray-800">{tournee.tauxCompletion}%</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-1.5">
+              <div
+                className="bg-emerald-500 h-1.5 rounded-full transition-all"
+                style={{ width: `${tournee.tauxCompletion}%` }}
+              ></div>
+            </div>
+          </div>
+        )}
       </div>
 
-      {tournee.anomalies > 0 && (
-        <div className="flex items-center justify-between text-xs mb-3">
-          <span className="text-gray-600">Anomalies</span>
-          <span className="font-medium text-orange-600">{tournee.anomalies}</span>
-        </div>
-      )}
-
-      <Button
-        size="sm"
-        variant="ghost"
-        className="w-full"
-        onClick={() => onViewDetails(tournee.id)}
-      >
-        Voir détails
-      </Button>
+      <div className="flex space-x-2">
+        <Button 
+          size="sm" 
+          variant="ghost" 
+          className="flex-1" 
+          onClick={() => tournee.id && onViewDetails(tournee.id)}
+        >
+          <Eye size={14} className="mr-1" />
+          Détails
+        </Button>
+        <Button 
+          size="sm" 
+          variant="ghost" 
+          onClick={() => tournee.id && onEdit(tournee.id)}
+        >
+          <Edit size={14} />
+        </Button>
+        <Button 
+          size="sm" 
+          variant="ghost" 
+          onClick={() => tournee.id && onDelete(tournee.id)}
+        >
+          <Trash2 size={14} className="text-red-600" />
+        </Button>
+      </div>
     </Card>
   );
 };
