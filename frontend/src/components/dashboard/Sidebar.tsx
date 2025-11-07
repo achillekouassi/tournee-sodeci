@@ -20,7 +20,8 @@ const menuItems: MenuItem[] = [
   { id: 'tournees', label: 'Tournées', icon: MapPin },
   { id: 'releves', label: 'Relevés', icon: FileText },
   { id: 'recouvrement', label: 'Recouvrement', icon: TrendingUp },
-  { id: 'agents', label: 'Agents', icon: Users },
+  { id: 'directions', label: 'Directions', icon: Users },
+  { id: 'clients', label: 'Clients', icon: Users },
   { id: 'statistiques', label: 'Statistiques', icon: TrendingUp },
   { id: 'parametres', label: 'Paramètres', icon: Settings },
 ];

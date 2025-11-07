@@ -1,75 +1,128 @@
 // src/api/clientService.ts
+import { ClientDTO } from "../types/ClientDTO";
 import api from "./api";
+
 
 const BASE_URL = "/clients";
 
-// 🟢 Créer un client
-export const createClient = (data) => api.post(BASE_URL, data);
+// Exportez un objet service avec toutes les méthodes
+export const clientService = {
+  // 🟢 Créer un client
+  createClient: async (data: ClientDTO) => {
+    const response = await api.post(BASE_URL, data);
+    return response.data;
+  },
 
-// 🟡 Modifier un client
-export const updateClient = (id, data) => api.put(`${BASE_URL}/${id}`, data);
+  // 🟡 Modifier un client
+  updateClient: async (id: number, data: ClientDTO) => {
+    const response = await api.put(`${BASE_URL}/${id}`, data);
+    return response.data;
+  },
 
-// 🔵 Récupérer un client par ID
-export const getClientById = (id) => api.get(`${BASE_URL}/${id}`);
+  // 🔵 Récupérer un client par ID
+  getClientById: async (id: number) => {
+    const response = await api.get(`${BASE_URL}/${id}`);
+    return response.data;
+  },
 
-// 🟣 Récupérer tous les clients
-export const getAllClients = () => api.get(BASE_URL);
+  // 🟣 Récupérer tous les clients
+  getAllClients: async () => {
+    const response = await api.get(BASE_URL);
+    return response.data;
+  },
 
-// 📄 Récupérer les clients paginés
-export const getPaginatedClients = (page = 0, size = 10) =>
-  api.get(`${BASE_URL}/paginated?page=${page}&size=${size}`);
+  // 📄 Récupérer les clients paginés
+  getPaginatedClients: async (page: number = 0, size: number = 10) => {
+    const response = await api.get(`${BASE_URL}/paginated?page=${page}&size=${size}`);
+    return response.data;
+  },
 
-// ✅ Récupérer les clients actifs
-export const getActiveClients = () => api.get(`${BASE_URL}/active`);
+  // ✅ Récupérer les clients actifs
+  getActiveClients: async () => {
+    const response = await api.get(`${BASE_URL}/active`);
+    return response.data;
+  },
 
-// 🔍 Rechercher par référence contrat
-export const getClientByReferenceContrat = (referenceContrat) =>
-  api.get(`${BASE_URL}/reference-contrat/${referenceContrat}`);
+  // 🔍 Rechercher par référence contrat
+  getClientByReferenceContrat: async (referenceContrat: string) => {
+    const response = await api.get(`${BASE_URL}/reference-contrat/${referenceContrat}`);
+    return response.data;
+  },
 
-// 🏢 Récupérer les clients d’une agence
-export const getClientsByAgence = (agenceId) => api.get(`${BASE_URL}/agence/${agenceId}`);
+  // 🏢 Récupérer les clients d'une agence
+  getClientsByAgence: async (agenceId: number) => {
+    const response = await api.get(`${BASE_URL}/agence/${agenceId}`);
+    return response.data;
+  },
 
-// 🏢 Récupérer les clients par code agence
-export const getClientsByCodeAgence = (codeAgence) =>
-  api.get(`${BASE_URL}/code-agence/${codeAgence}`);
+  // 🏢 Récupérer les clients par code agence
+  getClientsByCodeAgence: async (codeAgence: string) => {
+    const response = await api.get(`${BASE_URL}/code-agence/${codeAgence}`);
+    return response.data;
+  },
 
-// 💳 Récupérer les clients par groupe de facturation
-export const getClientsByGroupeFacturation = (gf) =>
-  api.get(`${BASE_URL}/groupe-facturation/${gf}`);
+  // 💳 Récupérer les clients par groupe de facturation
+  getClientsByGroupeFacturation: async (gf: string) => {
+    const response = await api.get(`${BASE_URL}/groupe-facturation/${gf}`);
+    return response.data;
+  },
 
-// 🔎 Rechercher des clients par nom
-export const searchClientsByNom = (nom) =>
-  api.get(`${BASE_URL}/search?nom=${encodeURIComponent(nom)}`);
+  // 🔎 Rechercher des clients par nom
+  searchClientsByNom: async (nom: string) => {
+    const response = await api.get(`${BASE_URL}/search?nom=${encodeURIComponent(nom)}`);
+    return response.data;
+  },
 
-// ☎️ Rechercher des clients par téléphone
-export const getClientsByTelephone = (telephone) =>
-  api.get(`${BASE_URL}/telephone/${telephone}`);
+  // ☎️ Rechercher des clients par téléphone
+  getClientsByTelephone: async (telephone: string) => {
+    const response = await api.get(`${BASE_URL}/telephone/${telephone}`);
+    return response.data;
+  },
 
-// 💰 Récupérer les clients débiteurs
-export const getClientsWithDebt = () => api.get(`${BASE_URL}/with-debt`);
+  // 💰 Récupérer les clients débiteurs
+  getClientsWithDebt: async () => {
+    const response = await api.get(`${BASE_URL}/with-debt`);
+    return response.data;
+  },
 
-// 💸 Récupérer les clients débiteurs d'une agence
-export const getClientsWithDebtByAgence = (codeAgence) =>
-  api.get(`${BASE_URL}/with-debt/agence/${codeAgence}`);
+  // 💸 Récupérer les clients débiteurs d'une agence
+  getClientsWithDebtByAgence: async (codeAgence: string) => {
+    const response = await api.get(`${BASE_URL}/with-debt/agence/${codeAgence}`);
+    return response.data;
+  },
 
-// 🏦 Mettre à jour le solde compte
-export const updateSoldeCompte = (id, montant) =>
-  api.put(`${BASE_URL}/${id}/solde?montant=${montant}`);
+  // 🏦 Mettre à jour le solde compte
+  updateSoldeCompte: async (id: number, montant: number) => {
+    const response = await api.put(`${BASE_URL}/${id}/solde?montant=${montant}`);
+    return response.data;
+  },
 
-// 💵 Mettre à jour le montant dû
-export const updateMontantDu = (id, montant) =>
-  api.put(`${BASE_URL}/${id}/montant-du?montant=${montant}`);
+  // 💵 Mettre à jour le montant dû
+  updateMontantDu: async (id: number, montant: number) => {
+    const response = await api.put(`${BASE_URL}/${id}/montant-du?montant=${montant}`);
+    return response.data;
+  },
 
-// 📊 Statistiques - nombre de clients par agence
-export const countClientsByAgence = (codeAgence) =>
-  api.get(`${BASE_URL}/statistics/count-by-agence/${codeAgence}`);
+  // 📊 Statistiques - nombre de clients par agence
+  countClientsByAgence: async (codeAgence: string) => {
+    const response = await api.get(`${BASE_URL}/statistics/count-by-agence/${codeAgence}`);
+    return response.data;
+  },
 
-// 📈 Statistiques - somme des montants dus par agence
-export const sumMontantDuByAgence = (codeAgence) =>
-  api.get(`${BASE_URL}/statistics/sum-montant-du/${codeAgence}`);
+  // 📈 Statistiques - somme des montants dus par agence
+  sumMontantDuByAgence: async (codeAgence: string) => {
+    const response = await api.get(`${BASE_URL}/statistics/sum-montant-du/${codeAgence}`);
+    return response.data;
+  },
 
-// 🚫 Désactiver un client
-export const deactivateClient = (id) => api.patch(`${BASE_URL}/${id}/deactivate`);
+  // 🚫 Désactiver un client
+  deactivateClient: async (id: number) => {
+    const response = await api.patch(`${BASE_URL}/${id}/deactivate`);
+    return response.data;
+  },
 
-// 🗑️ Supprimer un client
-export const deleteClient = (id) => api.delete(`${BASE_URL}/${id}`);
+  // 🗑️ Supprimer un client
+  deleteClient: async (id: number) => {
+    await api.delete(`${BASE_URL}/${id}`);
+  }
+};

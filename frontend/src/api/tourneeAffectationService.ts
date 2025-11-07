@@ -1,44 +1,24 @@
+// src/services/tourneeAffectationService.ts
 import axios from "axios";
 import { TourneeAffectationDTO } from "../types/tourneeAffectation";
 
-const API_URL = "/api/tournees/affectations";
+const API_URL = "tournees/affectations";
 
-// ==================== Affectations ====================
-export const createAffectation = (data: TourneeAffectationDTO) =>
-  axios.post(API_URL, data);
-
-export const updateAffectation = (id: number, data: TourneeAffectationDTO) =>
-  axios.put(`${API_URL}/${id}`, data);
-
-export const getAffectationById = (id: number) =>
-  axios.get<TourneeAffectationDTO>(`${API_URL}/${id}`);
-
-export const getAllAffectations = () =>
-  axios.get<TourneeAffectationDTO[]>(API_URL);
-
-export const getAffectationsByTournee = (tourneeId: number) =>
-  axios.get<TourneeAffectationDTO[]>(`${API_URL}/tournee/${tourneeId}`);
-
-export const getAffectationsByAgent = (agentId: number) =>
-  axios.get<TourneeAffectationDTO[]>(`${API_URL}/agent/${agentId}`);
-
-export const demarrerTournee = (data: TourneeAffectationDTO) =>
-  axios.post(`${API_URL}/demarrer`, data);
-
-export const terminerTournee = (data: TourneeAffectationDTO) =>
-  axios.post(`${API_URL}/terminer`, data);
-
-export const mettreEnPause = (id: number) =>
-  axios.put(`${API_URL}/${id}/pause`);
-
-export const reprendreTournee = (id: number) =>
-  axios.put(`${API_URL}/${id}/reprendre`);
-
-export const annulerAffectation = (id: number, motif: string) =>
-  axios.put(`${API_URL}/${id}/annuler`, null, { params: { motif } });
-
-export const validerAffectation = (id: number) =>
-  axios.put(`${API_URL}/${id}/valider`);
-
-export const deleteAffectation = (id: number) =>
-  axios.delete(`${API_URL}/${id}`);
+export const tourneeAffectationService = {
+  createAffectation: (data: TourneeAffectationDTO) => axios.post(API_URL, data),
+  updateAffectation: (id: number, data: TourneeAffectationDTO) => axios.put(`${API_URL}/${id}`, data),
+  getAffectationById: (id: number) => axios.get<TourneeAffectationDTO>(`${API_URL}/${id}`),
+  getAllAffectations: () => axios.get<TourneeAffectationDTO[]>(API_URL),
+  getAffectationsByTournee: (tourneeId: number) => 
+    axios.get<TourneeAffectationDTO[]>(`${API_URL}/tournee/${tourneeId}`),
+  getAffectationsByAgent: (agentId: number) => 
+    axios.get<TourneeAffectationDTO[]>(`${API_URL}/agent/${agentId}`),
+  demarrerTournee: (data: any) => axios.post(`${API_URL}/demarrer`, data),
+  terminerTournee: (data: any) => axios.post(`${API_URL}/terminer`, data),
+  mettreEnPause: (id: number) => axios.put(`${API_URL}/${id}/pause`),
+  reprendreTournee: (id: number) => axios.put(`${API_URL}/${id}/reprendre`),
+  annulerAffectation: (id: number, motif: string) =>
+    axios.put(`${API_URL}/${id}/annuler`, null, { params: { motif } }),
+  validerAffectation: (id: number) => axios.put(`${API_URL}/${id}/valider`),
+  deleteAffectation: (id: number) => axios.delete(`${API_URL}/${id}`)
+};

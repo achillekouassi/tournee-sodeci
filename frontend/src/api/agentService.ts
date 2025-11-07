@@ -1,39 +1,39 @@
-import { AgentDTO, ChangePasswordDTO, RoleType } from "../types/Agent";
+// src/api/agentService.ts
+import { AgentDTO, ChangePasswordDTO, RoleType } from "../types/agent";
 import api from "./api";
-
 
 const BASE_URL = "/agents";
 
 // 🟢 Créer un agent
 export const createAgent = (data: AgentDTO) => api.post<AgentDTO>(BASE_URL, data);
 
-// 🟡 Modifier un agent
-export const updateAgent = (id: number, data: AgentDTO) =>
-  api.put<AgentDTO>(`${BASE_URL}/${id}`, data);
+// 🟡 Modifier un agent - CORRECTION: utiliser matricule au lieu de id
+export const updateAgent = (matricule: string, data: AgentDTO) =>
+  api.put<AgentDTO>(`${BASE_URL}/${matricule}`, data);
 
 // 🟠 Récupérer tous les agents
 export const getAllAgents = () => api.get<AgentDTO[]>(BASE_URL);
 
-// 🟣 Récupérer un agent par ID
-export const getAgentById = (id: number) => api.get<AgentDTO>(`${BASE_URL}/${id}`);
+// 🟣 Récupérer un agent par matricule - CORRECTION
+export const getAgentByMatricule = (matricule: string) => api.get<AgentDTO>(`${BASE_URL}/${matricule}`);
 
-// 🟤 Supprimer un agent
-export const deleteAgent = (id: number) => api.delete<void>(`${BASE_URL}/${id}`);
+// 🟤 Supprimer un agent - CORRECTION: utiliser matricule
+export const deleteAgent = (matricule: string) => api.delete<void>(`${BASE_URL}/${matricule}`);
 
-// 🔵 Désactiver un agent
-export const deactivateAgent = (id: number) => api.patch<void>(`${BASE_URL}/${id}/deactivate`);
+// 🔵 Désactiver un agent - CORRECTION
+export const deactivateAgent = (matricule: string) => api.patch<void>(`${BASE_URL}/${matricule}/deactivate`);
 
-// 🔒 Verrouiller / Déverrouiller
-export const lockAgent = (id: number) => api.patch<void>(`${BASE_URL}/${id}/lock`);
-export const unlockAgent = (id: number) => api.patch<void>(`${BASE_URL}/${id}/unlock`);
+// 🔒 Verrouiller / Déverrouiller - CORRECTION
+export const lockAgent = (matricule: string) => api.patch<void>(`${BASE_URL}/${matricule}/lock`);
+export const unlockAgent = (matricule: string) => api.patch<void>(`${BASE_URL}/${matricule}/unlock`);
 
-// 🔑 Changer mot de passe
-export const changePassword = (id: number, data: ChangePasswordDTO) =>
-  api.put<void>(`${BASE_URL}/${id}/change-password`, data);
+// 🔑 Changer mot de passe - CORRECTION
+export const changePassword = (matricule: string, data: ChangePasswordDTO) =>
+  api.put<void>(`${BASE_URL}/${matricule}/change-password`, data);
 
-// 🔑 Réinitialiser mot de passe
-export const resetPassword = (id: number, newPassword: string) =>
-  api.put<void>(`${BASE_URL}/${id}/reset-password?newPassword=${newPassword}`);
+// 🔑 Réinitialiser mot de passe - CORRECTION
+export const resetPassword = (matricule: string, newPassword: string) =>
+  api.put<void>(`${BASE_URL}/${matricule}/reset-password?newPassword=${newPassword}`);
 
 // 🔍 Recherches spécifiques
 export const getAgentsByAgence = (agenceId: number) => api.get<AgentDTO[]>(`${BASE_URL}/agence/${agenceId}`);
@@ -42,4 +42,21 @@ export const getAgentsByDirectionRegionale = (drId: number) =>
   api.get<AgentDTO[]>(`${BASE_URL}/direction-regionale/${drId}`);
 export const getAgentsByDirectionRegionaleAndRole = (drId: number, role: RoleType) =>
   api.get<AgentDTO[]>(`${BASE_URL}/direction-regionale/${drId}/role/${role}`);
-export const getAgentByMatricule = (matricule: string) => api.get<AgentDTO>(`${BASE_URL}/matricule/${matricule}`);
+
+// Exportez toutes les fonctions sous un objet agentService
+export const agentService = {
+  createAgent,
+  updateAgent,
+  getAllAgents,
+  getAgentByMatricule,
+  deleteAgent,
+  deactivateAgent,
+  lockAgent,
+  unlockAgent,
+  changePassword,
+  resetPassword,
+  getAgentsByAgence,
+  getAgentsByRole,
+  getAgentsByDirectionRegionale,
+  getAgentsByDirectionRegionaleAndRole
+};

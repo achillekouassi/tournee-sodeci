@@ -1,5 +1,4 @@
-// types/agent.ts
-
+// src/types/agent.ts
 export interface AgentDTO {
   matricule: string;
   nom: string;
@@ -14,6 +13,9 @@ export interface AgentDTO {
   directionRegionaleLibelle?: string;
   isLocked?: boolean;
   failedLoginAttempts?: number;
+  // Rendre ces propriétés optionnelles
+  createdDate?: string;
+  lastModifiedDate?: string;
 }
 
 export interface ChangePasswordDTO {

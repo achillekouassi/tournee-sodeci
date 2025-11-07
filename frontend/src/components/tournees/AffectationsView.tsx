@@ -1,132 +1,113 @@
 // src/pages/tournees/AffectationsView.tsx
-
-import React, { useState } from 'react';
-import { Plus, Search, Filter } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Plus, Search, Filter, RefreshCw } from 'lucide-react';
 import { TourneeAffectationDTO, StatutAffectation } from '../../types/tourneeAffectation';
 import { Button } from '../../components/ui/Button';
 import { Modal } from '../../components/ui/Modal';
 import { AffectationCard } from '../../components/tournees/AffectationCard';
+import { tourneeAffectationService } from '../../api/tourneeAffectationService';
 
 export const AffectationsView: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statutFilter, setStatutFilter] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [affectations, setAffectations] = useState<TourneeAffectationDTO[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
-  // Données de démonstration
-  const [affectations] = useState<TourneeAffectationDTO[]>([
-    {
-      id: 1,
-      tourneeId: 1,
-      tourneeCode: 'T-042',
-      tourneeLibelle: 'Cocody Angré - Zone résidentielle',
-      agentId: 1,
-      agentMatricule: 'A001',
-      agentNom: 'Jean Konan',
-      dateAffectation: '2025-01-06',
-      statut: StatutAffectation.TERMINEE,
-      nombreCompteursTotal: 245,
-      nombreCompteursReleves: 245,
-      nombreAnomalies: 3,
-      pourcentageCompletion: 100
-    },
-    {
-      id: 2,
-      tourneeId: 2,
-      tourneeCode: 'T-038',
-      tourneeLibelle: 'Yopougon - Quartier Niangon',
-      agentId: 2,
-      agentMatricule: 'A002',
-      agentNom: 'Paul Mensah',
-      dateAffectation: '2025-01-06',
-      dateDebutReelle: '2025-01-06T08:30:00',
-      statut: StatutAffectation.EN_COURS,
-      nombreCompteursTotal: 235,
-      nombreCompteursReleves: 158,
-      nombreAnomalies: 5,
-      pourcentageCompletion: 67
-    },
-    {
-      id: 3,
-      tourneeId: 3,
-      tourneeCode: 'T-051',
-      tourneeLibelle: 'Abobo - Zone commerciale',
-      agentId: 3,
-      agentMatricule: 'A003',
-      agentNom: 'Marie Diabaté',
-      dateAffectation: '2025-01-06',
-      statut: StatutAffectation.AFFECTEE,
-      nombreCompteursTotal: 250,
-      nombreCompteursReleves: 0,
-      nombreAnomalies: 0,
-      pourcentageCompletion: 0
-    },
-    {
-      id: 4,
-      tourneeId: 1,
-      tourneeCode: 'T-029',
-      tourneeLibelle: 'Plateau - Centre-ville',
-      agentId: 4,
-      agentMatricule: 'A004',
-      agentNom: 'Ibrahim Touré',
-      dateAffectation: '2025-01-05',
-      dateDebutReelle: '2025-01-05T09:00:00',
-      statut: StatutAffectation.EN_PAUSE,
-      nombreCompteursTotal: 180,
-      nombreCompteursReleves: 90,
-      nombreAnomalies: 2,
-      pourcentageCompletion: 50
-    },
-    {
-      id: 5,
-      tourneeId: 2,
-      tourneeCode: 'T-067',
-      tourneeLibelle: 'Marcory - Zone 4',
-      agentId: 5,
-      agentMatricule: 'A005',
-      agentNom: 'Sophie Bamba',
-      dateAffectation: '2025-01-05',
-      dateDebutReelle: '2025-01-05T08:00:00',
-      dateFinReelle: '2025-01-05T16:30:00',
-      statut: StatutAffectation.VALIDEE,
-      nombreCompteursTotal: 198,
-      nombreCompteursReleves: 198,
-      nombreAnomalies: 2,
-      pourcentageCompletion: 100
-    }
-  ]);
+
+  interface PaginatedResponse<T> {
+  content: T[];
+  totalElements?: number;
+  totalPages?: number;
+}
+
+const loadAffectations = async () => {
+  try {
+    setLoading(true);
+    setError(null);
+    const response = await tourneeAffectationService.getAllAffectations();
+
+    // Ici, on dit explicitement à TypeScript que response.data peut être un tableau ou un objet paginé
+    const data: TourneeAffectationDTO[] = Array.isArray(response.data)
+      ? response.data
+      : Array.isArray((response.data as PaginatedResponse<TourneeAffectationDTO>).content)
+      ? (response.data as PaginatedResponse<TourneeAffectationDTO>).content
+      : [];
+
+    setAffectations(data);
+  } catch (err) {
+    console.error('Erreur lors du chargement des affectations:', err);
+    setError('Impossible de charger les affectations. Vérifiez votre connexion.');
+    setAffectations([]);
+  } finally {
+    setLoading(false);
+    setRefreshing(false);
+  }
+};
+
+
+  useEffect(() => {
+    loadAffectations();
+  }, []);
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    loadAffectations();
+  };
 
   const filteredAffectations = affectations.filter(a => {
     const matchesSearch = 
       a.tourneeCode?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       a.agentNom.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      a.tourneeLibelle?.toLowerCase().includes(searchTerm.toLowerCase());
+      a.tourneeLibelle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      a.agentMatricule.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatut = !statutFilter || a.statut === statutFilter;
     return matchesSearch && matchesStatut;
   });
 
-  const handleAction = (id: number, action: string) => {
-    console.log('Action:', action, 'on affectation:', id);
-    // Ici, appeler les services API correspondants
-    switch(action) {
-      case 'start':
-        // demarrerTournee(id)
-        break;
-      case 'pause':
-        // mettreEnPause(id)
-        break;
-      case 'resume':
-        // reprendreTournee(id)
-        break;
-      case 'finish':
-        // terminerTournee(id)
-        break;
-      case 'validate':
-        // validerAffectation(id)
-        break;
+  const handleAction = async (id: number, action: string) => {
+    try {
+      const affectation = affectations.find(a => a.id === id);
+      if (!affectation) {
+        throw new Error('Affectation non trouvée');
+      }
+
+      switch(action) {
+        case 'start':
+          await tourneeAffectationService.demarrerTournee({
+            affectationId: id,
+            dateDebutReelle: new Date().toISOString()
+          });
+          break;
+        case 'pause':
+          await tourneeAffectationService.mettreEnPause(id);
+          break;
+        case 'resume':
+          await tourneeAffectationService.reprendreTournee(id);
+          break;
+        case 'finish':
+          await tourneeAffectationService.terminerTournee({
+            affectationId: id,
+            dateFinReelle: new Date().toISOString(),
+            observations: 'Terminé via l\'application'
+          });
+          break;
+        case 'validate':
+          await tourneeAffectationService.validerAffectation(id);
+          break;
+        default:
+          console.warn('Action non reconnue:', action);
+      }
+      
+      await loadAffectations();
+    } catch (err) {
+      console.error(`Erreur lors de l'action ${action}:`, err);
+      alert(`Erreur lors de l'exécution de l'action: ${err instanceof Error ? err.message : 'Erreur inconnue'}`);
     }
   };
 
-  // Composant du formulaire d'affectation
   const AffectationForm: React.FC<{
     onSubmit: (data: any) => void;
     onCancel: () => void;
@@ -163,7 +144,6 @@ export const AffectationsView: React.FC = () => {
             <option value="1">T-042 - Cocody Angré</option>
             <option value="2">T-038 - Yopougon Niangon</option>
             <option value="3">T-051 - Abobo</option>
-            <option value="4">T-029 - Plateau</option>
           </select>
         </div>
 
@@ -263,23 +243,75 @@ export const AffectationsView: React.FC = () => {
     );
   };
 
+  const handleCreateAffectation = async (data: any) => {
+    try {
+      await tourneeAffectationService.createAffectation({
+        tourneeId: data.tourneeId,
+        agentId: data.agentId,
+        agentMatricule: data.agentMatricule,
+        agentNom: data.agentNom,
+        dateAffectation: data.dateAffectation,
+        dateDebutPrevue: data.dateDebutPrevue,
+        dateFinPrevue: data.dateFinPrevue,
+        observations: data.observations,
+        statut: StatutAffectation.AFFECTEE
+      });
+      setShowModal(false);
+      await loadAffectations();
+    } catch (err) {
+      console.error('Erreur lors de la création:', err);
+      alert('Erreur lors de la création de l\'affectation');
+    }
+  };
+
+  if (loading && !refreshing) {
+    return (
+      <div className="flex justify-center items-center p-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
+        <span className="ml-2 text-gray-600">Chargement des affectations...</span>
+      </div>
+    );
+  }
+
+  if (error && affectations.length === 0) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+        <p className="text-red-700 mb-4">{error}</p>
+        <Button onClick={loadAffectations}>
+          Réessayer
+        </Button>
+      </div>
+    );
+  }
+
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-bold text-gray-800">Affectations</h2>
-          <p className="text-xs text-gray-600 mt-1">
+          <h2 className="text-xl font-bold text-gray-900">Affectations des Tournées</h2>
+          <p className="text-sm text-gray-600 mt-1">
             {filteredAffectations.length} affectation(s) trouvée(s)
+            {statutFilter && ` • Filtre: ${statutFilter}`}
           </p>
         </div>
-        <Button size="sm" onClick={() => setShowModal(true)}>
-          <Plus size={16} className="mr-1" />
-          Nouvelle affectation
-        </Button>
+        <div className="flex space-x-3">
+          <Button 
+            variant="secondary" 
+            onClick={handleRefresh}
+            disabled={refreshing}
+          >
+            <RefreshCw size={16} className={`mr-1 ${refreshing ? 'animate-spin' : ''}`} />
+            Actualiser
+          </Button>
+          <Button onClick={() => setShowModal(true)}>
+            <Plus size={16} className="mr-1" />
+            Nouvelle affectation
+          </Button>
+        </div>
       </div>
 
       {/* Filtres */}
-      <div className="bg-white p-4 rounded-lg border border-gray-200 mb-4">
+      <div className="bg-white p-4 rounded-lg border border-gray-200">
         <div className="flex flex-col md:flex-row gap-3">
           <div className="flex-1 relative">
             <Search 
@@ -288,7 +320,7 @@ export const AffectationsView: React.FC = () => {
             />
             <input
               type="text"
-              placeholder="Rechercher par tournée ou agent..."
+              placeholder="Rechercher par tournée, agent ou matricule..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               className="w-full pl-9 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
@@ -312,8 +344,13 @@ export const AffectationsView: React.FC = () => {
         </div>
       </div>
 
-      {/* Liste des affectations */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {error && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <p className="text-yellow-700 text-sm">{error}</p>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredAffectations.map(affectation => (
           <AffectationCard
             key={affectation.id}
@@ -323,23 +360,37 @@ export const AffectationsView: React.FC = () => {
         ))}
       </div>
 
-      {filteredAffectations.length === 0 && (
-        <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
-          <p className="text-sm text-gray-600">Aucune affectation trouvée</p>
+      {filteredAffectations.length === 0 && !loading && (
+        <div className="bg-white rounded-lg border-2 border-dashed border-gray-300 p-12 text-center">
+          <div className="max-w-md mx-auto">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Plus size={24} className="text-gray-400" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Aucune affectation trouvée</h3>
+            <p className="text-gray-500 mb-4">
+              {searchTerm || statutFilter
+                ? "Aucune affectation ne correspond à vos critères de recherche." 
+                : "Commencez par créer votre première affectation."
+              }
+            </p>
+            {!searchTerm && !statutFilter && (
+              <Button onClick={() => setShowModal(true)}>
+                <Plus size={16} className="mr-1" />
+                Créer une affectation
+              </Button>
+            )}
+          </div>
         </div>
       )}
 
-      {/* Modal de création */}
       <Modal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         title="Nouvelle affectation"
+        size="lg"
       >
         <AffectationForm
-          onSubmit={(data) => {
-            console.log('Creating affectation:', data);
-            setShowModal(false);
-          }}
+          onSubmit={handleCreateAffectation}
           onCancel={() => setShowModal(false)}
         />
       </Modal>

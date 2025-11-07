@@ -4,6 +4,8 @@ import { AuthPage } from './pages/AuthPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { TourneesPage } from './pages/TourneesPage';
 import { Layout } from './components/dashboard/Layout';
+import { DirectionPage } from './pages/DirectionPage';
+import { ClientPage } from './pages/ClientPage';
 
 const getRoleLabel = (role?: string) => {
   switch (role) {
@@ -25,6 +27,8 @@ function AppContent() {
     switch (activeModule) {
       case 'dashboard': return <DashboardPage />;
       case 'tournees': return <TourneesPage />;
+      case 'directions': return <DirectionPage />;
+      case 'clients': return <ClientPage />;
       default:
         return (
           <div className="bg-white rounded-lg border border-gray-200 p-6">

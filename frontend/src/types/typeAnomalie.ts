@@ -1,5 +1,6 @@
 import { CategorieAnomalie } from "./categorieAnomalie";
-import { SeveriteAnomalie } from "./SeveriteAnomalie";
+import { SeveriteAnomalie } from "./severiteAnomalie";
+
 
 
 

@@ -1,19 +1,41 @@
-import axios from "axios";
+// src/api/tourneeService.ts
+import api from "./api";
 import { TourneeDTO } from "../types/tournee";
 
-const API_URL = "/api/tournees";
+export const tourneeService = {
+  createTournee: (data: TourneeDTO) => api.post("/tournees", data),
 
-// ==================== Tournées ====================
-export const createTournee = (data: TourneeDTO) => axios.post(API_URL, data);
-export const updateTournee = (id: number, data: TourneeDTO) => axios.put(`${API_URL}/${id}`, data);
-export const getTourneeById = (id: number) => axios.get<TourneeDTO>(`${API_URL}/${id}`);
-export const getAllTournees = () => axios.get<TourneeDTO[]>(API_URL);
-export const getTourneesPaginated = (params: Record<string, any>) => axios.get<{ content: TourneeDTO[]; totalElements: number }>(`${API_URL}/paginated`, { params });
-export const getActiveTournees = () => axios.get<TourneeDTO[]>(`${API_URL}/active`);
-export const getTourneeByCode = (codeTournee: string) => axios.get<TourneeDTO>(`${API_URL}/code/${codeTournee}`);
-export const getTourneesByAgence = (agenceId: number) => axios.get<TourneeDTO[]>(`${API_URL}/agence/${agenceId}`);
-export const getTourneesByStatut = (statut: string) => axios.get<TourneeDTO[]>(`${API_URL}/statut/${statut}`);
-export const updateStatutTournee = (id: number, statut: string) => axios.put(`${API_URL}/${id}/statut`, null, { params: { statut } });
-export const deleteTournee = (id: number) => axios.delete(`${API_URL}/${id}`);
-export const softDeleteTournee = (id: number) => axios.patch(`${API_URL}/${id}/deactivate`);
-export const getTourneeStatistiques = (id: number) => axios.get(`${API_URL}/${id}/statistiques`);
+  updateTournee: (id: number, data: TourneeDTO) =>
+    api.put(`/tournees/${id}`, data),
+
+  getTourneeById: (id: number) => api.get<TourneeDTO>(`/tournees/${id}`),
+
+  getAllTournees: () => api.get<TourneeDTO[]>("/tournees"),
+
+  getTourneesPaginated: (params: Record<string, any>) =>
+    api.get<{ content: TourneeDTO[]; totalElements: number }>(
+      "/tournees/paginated",
+      { params }
+    ),
+
+  getActiveTournees: () => api.get<TourneeDTO[]>("/tournees/active"),
+
+  getTourneeByCode: (codeTournee: string) =>
+    api.get<TourneeDTO>(`/tournees/code/${codeTournee}`),
+
+  getTourneesByAgence: (agenceId: number) =>
+    api.get<TourneeDTO[]>(`/tournees/agence/${agenceId}`),
+
+  getTourneesByStatut: (statut: string) =>
+    api.get<TourneeDTO[]>(`/tournees/statut/${statut}`),
+
+  updateStatutTournee: (id: number, statut: string) =>
+    api.put(`/tournees/${id}/statut`, null, { params: { statut } }),
+
+  deleteTournee: (id: number) => api.delete(`/tournees/${id}`),
+
+  softDeleteTournee: (id: number) => api.patch(`/tournees/${id}/deactivate`),
+
+  getTourneeStatistiques: (id: number) =>
+    api.get(`/tournees/${id}/statistiques`),
+};

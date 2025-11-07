@@ -1,5 +1,5 @@
 // src/api/recouvrementEcheancierService.ts
-import { PayerEcheanceDTO } from "../types/PayerEcheance";
+import { PayerEcheanceDTO } from "../types/payerEcheance";
 import { StatutEcheance } from "../types/statutEcheance";
 import api from "./api";
 import { RecouvrementEcheancierDTO } from "./recouvrementEcheancier";
