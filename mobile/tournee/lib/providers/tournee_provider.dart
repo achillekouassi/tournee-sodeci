@@ -54,7 +54,7 @@ class TourneeProvider extends ChangeNotifier {
     }
   }
 
-  // ✅ CORRECTION PRINCIPALE : Recharger les clients après la création
+  // ✅ Mise à jour avec GPS et photo base64
   Future<bool> createReleve({
     required int clientId,
     required int tourneeId,
@@ -63,7 +63,9 @@ class TourneeProvider extends ChangeNotifier {
     required int agentId,
     required String token,
     String? commentaire,
-    String? photoUrl,
+    String? photoBase64, // ✅ Changé de photoUrl à photoBase64
+    double? latitude, // ✅ Ajout GPS
+    double? longitude, // ✅ Ajout GPS
   }) async {
     try {
       await ApiService.createReleve(
@@ -74,12 +76,14 @@ class TourneeProvider extends ChangeNotifier {
         agentId: agentId,
         token: token,
         commentaire: commentaire,
-        photoUrl: photoUrl,
+        photoBase64: photoBase64,
+        latitude: latitude,
+        longitude: longitude,
       );
       
       _error = null;
       
-      // ✅ IMPORTANT : Recharger la liste des clients pour mettre à jour l'UI
+      // Recharger la liste des clients pour mettre à jour l'UI
       await fetchClients(tourneeId, token);
       
       return true;

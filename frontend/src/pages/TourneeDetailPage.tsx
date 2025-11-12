@@ -33,10 +33,15 @@ interface Client {
   nomMatriAZ: string;
   adresse: string;
   numeroCompteur: string;
-  calibre: string;
+  nouvelIndex: number;
   typeCompteur: string;
   statusClient: string;
-  clientNom: string;
+  nomClient: string; // <-- ici
+  typeClient: string;
+  montantFacture: number;
+  consoFaturer: number;
+  statutFacture: string;
+  
 }
 
 interface Releve {
@@ -432,31 +437,28 @@ export function TourneeDetailPage({ token, tourneeId, onBack }: TourneeDetailPag
               <table className="w-full text-sm">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-4 py-3 text-left font-medium text-gray-700">Nom</th>
                     <th className="px-4 py-3 text-left font-medium text-gray-700">Client</th>
+                    <th className="px-4 py-3 text-left font-medium text-gray-700">type Client</th>
                     <th className="px-4 py-3 text-left font-medium text-gray-700">Compteur</th>
-                    <th className="px-4 py-3 text-left font-medium text-gray-700">Calibre</th>
-                    <th className="px-4 py-3 text-left font-medium text-gray-700">Type</th>
-                    <th className="px-4 py-3 text-left font-medium text-gray-700">Statut</th>
+                    <th className="px-4 py-3 text-left font-medium text-gray-700">Nouvel Index</th>
+                    <th className="px-4 py-3 text-left font-medium text-gray-700">Facture</th>
+                    <th className="px-4 py-3 text-left font-medium text-gray-700">Consommation</th>
+                    <th className="px-4 py-3 text-left font-medium text-gray-700">Numero facture</th>
+                    <th className="px-4 py-3 text-left font-medium text-gray-700">Statut Facture</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {currentClients.map(client => (
                     <tr key={client.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 font-medium text-gray-800">{client.clientNom || '-'}</td>
-                      <td className="px-4 py-3 text-gray-600">{client.nomMatriAZ || '-'}</td>
+                      <td className="px-4 py-3 font-medium text-gray-800">{client.nomClient || '-'}</td>
+                      <td className="px-4 py-3 text-gray-600">{client.typeClient || '-'}</td>
                       <td className="px-4 py-3 text-gray-600 font-mono">{client.numeroCompteur || '-'}</td>
-                      <td className="px-4 py-3 text-gray-600">{client.calibre || '-'}</td>
-                      <td className="px-4 py-3 text-gray-600">{client.typeCompteur || '-'}</td>
-                      <td className="px-4 py-3">
-                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs ${
-                          client.statusClient === 'ACTIF' 
-                            ? 'bg-green-100 text-green-700' 
-                            : 'bg-gray-100 text-gray-700'
-                        }`}>
-                          {client.statusClient || 'INCONNU'}
-                        </span>
-                      </td>
+                      <td className="px-4 py-3 text-gray-600">{client.nouvelIndex || '-'}</td>
+                      <td className="px-4 py-3 text-gray-600">{client.montantFacture || '-'}</td>
+                      <td className="px-4 py-3 text-gray-600 font-mono">{client.consoFaturer || '-'}</td>
+                      <td className="px-4 py-3 text-gray-600">{client.numeroFacture || '-'}</td>
+                      <td className="px-4 py-3 text-gray-600">{client.statutFacture || '-'}</td>
+                    
                     </tr>
                   ))}
                 </tbody>

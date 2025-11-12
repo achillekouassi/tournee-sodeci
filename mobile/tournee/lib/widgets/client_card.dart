@@ -13,6 +13,12 @@ class ClientCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool hasNouvelIndex = client.nouvelIndex != null;
+
+    // Couleurs
+    final Color bleu = const Color(0xFF1E88E5);
+    final Color vert = Colors.green;
+
     return Card(
       child: InkWell(
         onTap: onTap,
@@ -21,26 +27,29 @@ class ClientCard extends StatelessWidget {
           padding: const EdgeInsets.all(14),
           child: Row(
             children: [
+              // Icône de validation
               Container(
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: client.releve
-                      ? const Color(0xFF1E88E5).withOpacity(0.1)
-                      : Colors.grey.shade50,
+                  color: hasNouvelIndex
+                      ? vert.withOpacity(0.1)
+                      : bleu.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
-                  client.releve ? Icons.check_circle : Icons.radio_button_unchecked,
-                  color: client.releve ? const Color(0xFF1E88E5) : Colors.grey.shade400,
+                  hasNouvelIndex ? Icons.check_circle : Icons.radio_button_unchecked,
+                  color: hasNouvelIndex ? vert : bleu,
                   size: 24,
                 ),
               ),
               const SizedBox(width: 14),
+              // Infos client
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Numéro compteur
                     Text(
                       client.numeroCompteur,
                       style: const TextStyle(
@@ -50,6 +59,7 @@ class ClientCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 4),
+                    // Adresse
                     Text(
                       client.adresse,
                       style: TextStyle(
@@ -60,16 +70,19 @@ class ClientCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
+                    // Index
                     Text(
-                      'Index: ${client.ancienIndex}',
+                      'Index: ${client.nouvelIndex ?? "Non relevé"}',
                       style: TextStyle(
                         fontSize: 11,
-                        color: Colors.grey.shade500,
+                        color: hasNouvelIndex ? vert : bleu,
+                        fontWeight: hasNouvelIndex ? FontWeight.bold : FontWeight.normal,
                       ),
                     ),
                   ],
                 ),
               ),
+              // Flèche
               Icon(
                 Icons.chevron_right,
                 color: Colors.grey.shade300,

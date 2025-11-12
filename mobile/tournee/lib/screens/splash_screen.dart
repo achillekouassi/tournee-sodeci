@@ -60,7 +60,7 @@ class _SplashScreenState extends State<SplashScreen> {
             ),
             const SizedBox(height: 24),
             const Text(
-              'Relevé Compteurs',
+              'Relevé index',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.w600,

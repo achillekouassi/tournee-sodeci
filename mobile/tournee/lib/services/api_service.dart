@@ -73,6 +73,7 @@ class ApiService {
     }
   }
 
+  // ✅ Mise à jour avec GPS et photo base64
   static Future<void> createReleve({
     required int clientId,
     required int tourneeId,
@@ -81,13 +82,28 @@ class ApiService {
     required int agentId,
     required String token,
     String? commentaire,
-    String? photoUrl,
+    String? photoBase64, // ✅ Changé de photoUrl à photoBase64
+    double? latitude, // ✅ Ajout GPS
+    double? longitude, // ✅ Ajout GPS
   }) async {
     try {
       print('🔵 Création relevé pour client $clientId');
       print('🔵 URL: ${AppConfig.createReleve}?agentId=$agentId');
-      print('🔵 Données: clientId=$clientId, tourneeId=$tourneeId, nouvelIndex=$nouvelIndex, casReleve=$casReleve');
+      print('🔵 Données: clientId=$clientId, tourneeId=$tourneeId, nouvelIndex=$nouvelIndex');
+      print('🔵 GPS: lat=$latitude, lon=$longitude');
+      print('🔵 Photo: ${photoBase64 != null ? "présente (${photoBase64.length} chars)" : "absente"}');
       
+      final body = {
+        'clientId': clientId,
+        'tourneeId': tourneeId,
+        'nouvelIndex': nouvelIndex,
+        'casReleve': casReleve,
+        'commentaire': commentaire,
+        'photoBase64': photoBase64, // ✅ Photo en base64
+        'latitude': latitude, // ✅ GPS
+        'longitude': longitude, // ✅ GPS
+      };
+
       final response = await http
           .post(
             Uri.parse('${AppConfig.createReleve}?agentId=$agentId'),
@@ -95,14 +111,7 @@ class ApiService {
               'Authorization': 'Bearer $token',
               'Content-Type': 'application/json',
             },
-            body: jsonEncode({
-              'clientId': clientId,
-              'tourneeId': tourneeId,
-              'nouvelIndex': nouvelIndex,
-              'casReleve': casReleve,
-              'commentaire': commentaire,
-              'photoUrl': photoUrl,
-            }),
+            body: jsonEncode(body),
           )
           .timeout(AppConfig.timeoutDuration);
 

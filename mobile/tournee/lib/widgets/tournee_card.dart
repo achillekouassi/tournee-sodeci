@@ -13,6 +13,13 @@ class TourneeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Déterminer si la tournée est terminée
+    final bool isTerminee = tournee.tauxAvancement >= 100;
+
+    // Couleurs
+    final Color vert = Colors.green;
+    final Color bleu = const Color(0xFF1E88E5);
+
     return Card(
       child: InkWell(
         onTap: onTap,
@@ -22,6 +29,7 @@ class TourneeCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Header code + statut
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -41,15 +49,15 @@ class TourneeCard extends StatelessWidget {
                       vertical: 5,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1E88E5).withOpacity(0.1),
+                      color: (isTerminee ? vert : bleu).withOpacity(0.1),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
-                      _getStatutLabel(tournee.statut),
-                      style: const TextStyle(
+                      isTerminee ? 'Terminée' : _getStatutLabel(tournee.statut),
+                      style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF1E88E5),
+                        color: isTerminee ? vert : bleu,
                       ),
                     ),
                   ),
@@ -64,6 +72,7 @@ class TourneeCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
+              // Avancement
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -76,10 +85,10 @@ class TourneeCard extends StatelessWidget {
                   ),
                   Text(
                     '${tournee.tauxAvancement.toStringAsFixed(0)}%',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF1E88E5),
+                      color: isTerminee ? vert : bleu,
                     ),
                   ),
                 ],
@@ -91,8 +100,8 @@ class TourneeCard extends StatelessWidget {
                   value: tournee.tauxAvancement / 100,
                   minHeight: 6,
                   backgroundColor: Colors.grey.shade100,
-                  valueColor: const AlwaysStoppedAnimation<Color>(
-                    Color(0xFF1E88E5),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    isTerminee ? vert : bleu,
                   ),
                 ),
               ),

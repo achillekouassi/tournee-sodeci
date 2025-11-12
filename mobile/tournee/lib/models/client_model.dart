@@ -6,6 +6,8 @@ class ClientModel {
   final int ancienIndex;
   final bool releve;
   final String? casReleve;
+  final int? nouvelIndex;
+  
 
   ClientModel({
     required this.id,
@@ -14,6 +16,7 @@ class ClientModel {
     required this.nomMatriAZ,
     required this.ancienIndex,
     required this.releve,
+    this.nouvelIndex,
     this.casReleve,
   });
 
@@ -26,6 +29,7 @@ class ClientModel {
       ancienIndex: json['ancienIndex'] ?? 0,
       releve: json['releve'] ?? false,
       casReleve: json['casReleve'],
+      nouvelIndex: json['nouvelIndex'],
     );
   }
 }

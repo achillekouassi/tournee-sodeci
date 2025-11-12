@@ -1,5 +1,5 @@
 class AppConfig {
-  static const String baseUrl = 'http://192.168.1.111:8080/api';
+  static const String baseUrl = 'http://192.168.1.112:8080/api';
   static const String authLogin = '$baseUrl/auth/login';
   static const String tourneesActives = '$baseUrl/tournees/agent';
   static const String clientsTournee = '$baseUrl/clients/tournee';

@@ -8,9 +8,9 @@ class CameraService {
     try {
       final XFile? photo = await _picker.pickImage(
         source: ImageSource.camera,
-        imageQuality: 70,
-        maxWidth: 1024,
-        maxHeight: 1024,
+        imageQuality: 50, // ✅ Réduit à 50% pour limiter la taille
+        maxWidth: 800,    // ✅ Réduit la résolution
+        maxHeight: 800,   // ✅ Réduit la résolution
       );
 
       if (photo != null) {

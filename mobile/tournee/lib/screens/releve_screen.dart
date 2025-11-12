@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
@@ -55,67 +56,105 @@ class _ReleveScreenState extends State<ReleveScreen> {
     }
   }
 
-Future<void> _submitReleve() async {
-  if (_indexController.text.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Veuillez saisir l\'index'),
-        backgroundColor: Colors.red,
-      ),
-    );
-    return;
+  // ✅ Convertir l'image en base64
+  Future<String?> _encodeImageToBase64(File imageFile) async {
+    try {
+      final bytes = await imageFile.readAsBytes();
+      return base64Encode(bytes);
+    } catch (e) {
+      print('Erreur encodage image: $e');
+      return null;
+    }
   }
 
-  if (_photo == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Veuillez prendre une photo'),
-        backgroundColor: Colors.red,
-      ),
+  Future<void> _submitReleve() async {
+    if (_indexController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Veuillez saisir l\'index'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    if (_photo == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Veuillez prendre une photo'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // ✅ Vérifier la position GPS
+    if (_position == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Position GPS non disponible'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      // On continue quand même mais sans GPS
+    }
+
+    setState(() => _isSubmitting = true);
+
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final tourneeProvider = Provider.of<TourneeProvider>(context, listen: false);
+
+    // ✅ Encoder la photo en base64
+    final photoBase64 = await _encodeImageToBase64(_photo!);
+
+    if (photoBase64 == null) {
+      if (!mounted) return;
+      setState(() => _isSubmitting = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Erreur lors du traitement de la photo'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    final success = await tourneeProvider.createReleve(
+      clientId: widget.client.id,
+      tourneeId: widget.tourneeId,
+      nouvelIndex: int.parse(_indexController.text),
+      casReleve: _casReleve,
+      agentId: authProvider.user!.userId,
+      token: authProvider.user!.token,
+      commentaire: _commentaireController.text.isEmpty
+          ? null
+          : _commentaireController.text,
+      photoBase64: photoBase64, // ✅ Envoyer la photo en base64
+      latitude: _position?.latitude, // ✅ Envoyer les coordonnées GPS
+      longitude: _position?.longitude,
     );
-    return;
+
+    if (!mounted) return;
+
+    setState(() => _isSubmitting = false);
+
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Relevé enregistré avec succès'),
+          backgroundColor: Colors.green,
+        ),
+      );
+      Navigator.pop(context, true);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(tourneeProvider.error ?? 'Erreur'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
-
-  setState(() => _isSubmitting = true);
-
-  final authProvider = Provider.of<AuthProvider>(context, listen: false);
-  final tourneeProvider = Provider.of<TourneeProvider>(context, listen: false);
-
-  final success = await tourneeProvider.createReleve(
-    clientId: widget.client.id,
-    tourneeId: widget.tourneeId,
-    nouvelIndex: int.parse(_indexController.text),
-    casReleve: _casReleve,
-    agentId: authProvider.user!.userId,
-    token: authProvider.user!.token,
-    commentaire: _commentaireController.text.isEmpty
-        ? null
-        : _commentaireController.text,
-    photoUrl: _photo?.path,
-  );
-
-  if (!mounted) return;
-
-  setState(() => _isSubmitting = false);
-
-  if (success) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Relevé enregistré avec succès'),
-        backgroundColor: Colors.green,
-      ),
-    );
-    // ⬇️ CHANGEMENT ICI : Retourner true au lieu de rien
-    Navigator.pop(context, true);
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(tourneeProvider.error ?? 'Erreur'),
-        backgroundColor: Colors.red,
-      ),
-    );
-  }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -151,8 +190,8 @@ Future<void> _submitReleve() async {
                       value: widget.client.numeroCompteur,
                     ),
                     _InfoRow(
-                      label: 'Ancien index',
-                      value: '${widget.client.ancienIndex}',
+                      label: 'Index',
+                      value: '${widget.client.nouvelIndex}',
                     ),
                     _InfoRow(
                       label: 'Adresse',
@@ -193,19 +232,7 @@ Future<void> _submitReleve() async {
                       ),
                       onChanged: (value) => setState(() {}),
                     ),
-                    if (_indexController.text.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8),
-                        child: Text(
-                          'Consommation: $consommation m³',
-                          style: TextStyle(
-                            color: consommation < 0
-                                ? Colors.red
-                                : Colors.green,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
+              
                   ],
                 ),
               ),
@@ -312,8 +339,10 @@ Future<void> _submitReleve() async {
                         DropdownMenuItem(value: 'ABSENCE', child: Text('Absence client')),
                         DropdownMenuItem(value: 'REFUS_ACCES', child: Text('Refus d\'accès')),
                         DropdownMenuItem(value: 'COMPTEUR_CASSE', child: Text('Compteur cassé')),
-                        DropdownMenuItem(value: 'CONSOMMATION_TROP_FAIBLE', child: Text('Consommation trop faible')),
-                        DropdownMenuItem(value: 'CONSOMMATION_TROP_ELEVEE', child: Text('Consommation trop élevée')),
+                        DropdownMenuItem(value: 'BRANCHEMENT_DEPOSE', child: Text('Branchement detruit')),
+                        DropdownMenuItem(value: 'COMPTEUR_DEPOSE', child: Text('Compteur deposé')),
+                        DropdownMenuItem(value: 'PAS_VUE', child: Text('Pas vue')),
+
                       ],
                       onChanged: (value) {
                         setState(() => _casReleve = value!);
