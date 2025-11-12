@@ -1,9 +1,0 @@
-export enum StatutReleve {
-  VALIDE,
-  EN_ATTENTE,
-  SUSPENDU,
-  REJETE,
-  A_CORRIGER,
-  CORRIGE,
-  VALIDE_AVEC_RESERVE
-}
